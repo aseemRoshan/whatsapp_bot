@@ -1,0 +1,391 @@
+/* Premium Dashboard Design */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #4361ee;
+  --primary-light: #4895ef;
+  --primary-dark: #3f37c9;
+  --success: #34c759;
+  --danger: #ff3b30;
+  --text-primary: #333;
+  --text-secondary: #666;
+  --bg-light: #f8f9fc;
+  --card-bg: #ffffff;
+  --border-radius: 16px;
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+body {
+  font-family: 'Inter', 'Poppins', 'Roboto', sans-serif;
+  line-height: 1.7;
+  color: var(--text-primary);
+  background-color: var(--bg-light);
+  padding: 25px;
+  background-image: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+  min-height: 100vh;
+}
+
+/* Container Styles */
+#qr-container, #setup-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 40px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+#qr-container::before, #setup-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--primary-light), var(--primary-dark));
+}
+
+h1 {
+  color: var(--text-primary);
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 35px;
+  text-align: left;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 18px;
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+  margin: 35px 0 25px;
+  text-align: left;
+  letter-spacing: -0.3px;
+}
+
+/* QR Code Styles */
+#qr-code {
+  width: 300px;
+  height: 300px;
+  margin: 35px auto;
+  border: none;
+  padding: 0;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transition: var(--transition);
+}
+
+#qr-code:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+#qr-container p {
+  color: var(--text-secondary);
+  font-size: 18px;
+  margin-top: 25px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Form Elements */
+label {
+  display: block;
+  margin: 18px 0 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+  font-size: 16px;
+}
+
+input, select {
+  width: 100%;
+  padding: 16px;
+  margin: 8px 0 22px;
+  border: 2px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  font-size: 16px;
+  transition: var(--transition);
+  background-color: rgba(0, 0, 0, 0.02);
+  font-weight: 500;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: var(--card-bg);
+  box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+}
+
+input[type="time"] {
+  width: 200px;
+  font-family: inherit;
+}
+
+/* Students List */
+#students-list {
+  margin: 30px 0;
+  text-align: left;
+}
+
+.student-entry {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 22px;
+  border-radius: 14px;
+  border-left: 5px solid var(--primary);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  transition: var(--transition);
+}
+
+.student-entry:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
+  background-color: rgba(67, 97, 238, 0.03);
+}
+
+.student-name, .student-whatsapp, .student-number {
+  flex: 1;
+  margin-right: 15px;
+}
+
+.student-entry select.input-type {
+  width: 150px;
+  margin-right: 15px;
+}
+
+/* Buttons */
+button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 16px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 10px rgba(67, 97, 238, 0.25);
+  letter-spacing: 0.2px;
+}
+
+button:hover {
+  background-color: var(--primary-dark);
+  box-shadow: 0 8px 15px rgba(67, 97, 238, 0.35);
+  transform: translateY(-3px);
+}
+
+button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+}
+
+button[onclick="removeStudent(this)"] {
+  background-color: var(--danger);
+  padding: 14px 20px;
+  box-shadow: 0 4px 10px rgba(255, 59, 48, 0.2);
+}
+
+button[onclick="removeStudent(this)"]:hover {
+  background-color: #e02e24;
+  box-shadow: 0 8px 15px rgba(255, 59, 48, 0.3);
+}
+
+button[onclick="addStudent()"] {
+  background-color: var(--success);
+  box-shadow: 0 4px 10px rgba(52, 199, 89, 0.2);
+}
+
+button[onclick="addStudent()"]:hover {
+  background-color: #2db14f;
+  box-shadow: 0 8px 15px rgba(52, 199, 89, 0.3);
+}
+
+button[onclick="saveSetup()"] {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  margin-top: 35px;
+  padding: 18px 36px;
+  font-size: 18px;
+  font-weight: 600;
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+button[onclick="saveSetup()"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+button[onclick="saveSetup()"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: 0.5s;
+}
+
+button[onclick="saveSetup()"]::before {
+  animation: shimmer 2s infinite;
+}
+  
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+button[onclick="saveSetup()"]::after:hover {
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #qr-container, #setup-container {
+    margin: 20px 10px;
+    padding: 30px;
+    border-radius: 14px;
+  }
+  
+  h1 {
+    font-size: 28px;
+    margin-bottom: 25px;
+  }
+  
+  .student-entry {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .student-name, .student-whatsapp, .student-number {
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+  
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  #qr-code {
+    width: 250px;
+    height: 250px;
+  }
+}
+
+/* Animation Effects */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#setup-container {
+  animation: fadeIn 0.6s cubic-bezier(0.26, 0.86, 0.44, 0.985);
+}
+
+/* Improve select dropdowns */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+/* Better focus states for accessibility */
+button:focus, input:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+}
+
+/* Enhanced QR container */
+#qr-container {
+  text-align: center;
+  position: relative;
+}
+
+/* Loading state for QR */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+#qr-code:not([src]) {
+  background-color: rgba(0, 0, 0, 0.05);
+  animation: pulse 1.5s infinite;
+}
+button#stop-bot {
+  background-color: #ff4b6b;
+  margin-top: 25px;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+button#stop-bot:hover {
+  background-color: #e63c5c;
+}
+input#batch {
+  width: 200px; /* Match the width of time inputs for consistency */
+}
+.time-input-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.time-input-group input[type="number"] {
+  width: 50px; /* Smaller width for hours and minutes */
+  padding: 8px;
+  text-align: center;
+}
+
+.time-input-group select {
+  padding: 8px;
+}
+
+/* Adjust label to align with new layout */
+label {
+  display: block;
+  margin: 15px 0 8px;
+  font-weight: 500;
+  color: #444;
+  text-align: left;
+}
+
+/* Wrap time inputs in a div for each label */
+label .time-input-group {
+  margin-top: 5px;
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Task Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+
+  <div id="qr-container">
+    <h1>Scan QR Code</h1>
+    <img id="qr-code" alt="WhatsApp QR Code">
+    <p>Scan this with your WhatsApp to connect.</p>
+  </div>
+  <div id="setup-container" style="display: none;">
+    <h1>Setup Task Tracker</h1>
+    <label>Group: 
+      <select id="group-id">
+        <option value="">Select a group</option>
+      </select>
+    </label><br>
+    <label>Batch: <input type="text" id="batch" placeholder="e.g., BCK221 A" value="BCK221 A"></label><br>
+    <label>Report Time (Submission Deadline): 
+      <input type="number" id="report-hours" min="1" max="12" value="7" placeholder="HH">
+      :
+      <input type="number" id="report-minutes" min="0" max="59" value="40" placeholder="MM">
+      <select id="report-period">
+        <option value="AM">AM</option>
+        <option value="PM" selected>PM</option>
+      </select>
+    </label><br>
+    <label>Submission Start Time: 
+      <input type="number" id="start-hours" min="1" max="12" value="9" placeholder="HH">
+      :
+      <input type="number" id="start-minutes" min="0" max="59" value="00" placeholder="MM">
+      <select id="start-period">
+        <option value="AM" selected>AM</option>
+        <option value="PM">PM</option>
+      </select>
+    </label><br>
+    <h2>Add Students</h2>
+    <div id="students-list">
+      <div class="student-entry">
+        <input type="text" placeholder="Name" class="student-name">
+        <select class="input-type">
+          <option value="contact">Select Contact</option>
+          <option value="manual">Enter Number</option>
+        </select>
+        <select class="student-whatsapp contact-input" style="display: block;">
+          <option value="">Select a contact</option>
+        </select>
+        <input type="tel" class="student-number manual-input" placeholder="Enter phone number (e.g., 9123456789)" style="display: none;">
+        <button onclick="removeStudent(this)">Remove</button>
+      </div>
+    </div>
+    <button onclick="addStudent()">Add Student</button>
+    <button onclick="saveSetup()">Save and Start</button>
+    <button id="stop-bot" onclick="stopBot()" style="display: none;">Stop Bot</button>
+  </div>
+  <script src="script.js"></script>
+
+  <script>
+    const socket = io('http://localhost:3000');
+    console.log('Socket.IO initialized');
+
+    socket.on('connect', () => {
+      console.log('Connected to Socket.IO server');
+    });
+
+    socket.on('qr', (data) => {
+      console.log('QR received:', data);
+      document.getElementById('qr-code').src = data.qr;
+    });
+
+    socket.on('authenticated', (data) => {
+      console.log('Authenticated event received:', data);
+      document.getElementById('qr-container').style.display = 'none';
+      document.getElementById('setup-container').style.display = 'block';
+
+      const groupSelect = document.getElementById('group-id');
+      console.log('Groups from server:', data.groups);
+      if (!data.groups || data.groups.length === 0) {
+        console.log('No groups received');
+        const option = document.createElement('option');
+        option.value = '';
+        option.text = 'No groups found';
+        groupSelect.appendChild(option);
+      } else {
+        data.groups.forEach(group => {
+          console.log('Adding group:', group);
+          const option = document.createElement('option');
+          option.value = group.id;
+          option.text = group.name || 'Unnamed Group';
+          groupSelect.appendChild(option);
+        });
+      }
+
+      window.contacts = data.contacts || [];
+      console.log('Contacts stored:', window.contacts.length);
+
+      const studentSelect = document.querySelector('.student-whatsapp');
+      if (!data.contacts || data.contacts.length === 0) {
+        console.log('No contacts received');
+      } else {
+        data.contacts.forEach(contact => {
+          console.log('Adding contact:', contact);
+          const option = document.createElement('option');
+          option.value = contact.id;
+          option.text = contact.name;
+          studentSelect.appendChild(option);
+        });
+      }
+
+      document.querySelectorAll('.input-type').forEach(select => {
+        select.addEventListener('change', toggleInputType);
+      });
+
+      console.log('Setup UI should now be visible');
+    });
+
+    function toggleInputType(event) {
+      const studentEntry = event.target.closest('.student-entry');
+      const contactInput = studentEntry.querySelector('.contact-input');
+      const manualInput = studentEntry.querySelector('.manual-input');
+      if (event.target.value === 'contact') {
+        contactInput.style.display = 'block';
+        manualInput.style.display = 'none';
+      } else {
+        contactInput.style.display = 'none';
+        manualInput.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
