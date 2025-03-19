@@ -259,6 +259,23 @@ button#stop-bot:hover {
   background-color: #e63c5c;
 }
 
+button#logout-btn {
+  background-color: #6c757d;
+  margin-top: 25px;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+button#logout-btn:hover {
+  background-color: #5a6268;
+}
+
 #google-login {
   background-color: #4285f4;
   display: flex;
@@ -345,4 +362,191 @@ button:focus, input:focus, select:focus {
 #qr-code:not([src]) {
   background-color: rgba(0, 0, 0, 0.05);
   animation: pulse 1.5s infinite;
+}
+
+/* Admin Login */
+#admin-login-container {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 40px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  position: relative;
+}
+
+#admin-login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(90deg, #ff4b6b, #e63c5c);
+}
+
+#admin-login-btn {
+  background-color: #ff4b6b;
+  width: 100%;
+  margin-top: 20px;
+}
+
+#admin-login-btn:hover {
+  background-color: #e63c5c;
+}
+
+/* Admin Dashboard */
+#admin-dashboard {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 40px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  position: relative;
+}
+
+#admin-dashboard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(90deg, #ff4b6b, #e63c5c);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+th, td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+th {
+  background-color: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+td {
+  color: var(--text-primary);
+}
+
+tr:hover {
+  background-color: rgba(67, 97, 238, 0.05);
+}
+
+#admin-dashboard button {
+  background-color: #ff4b6b;
+  padding: 10px 20px;
+}
+
+#admin-dashboard button:hover {
+  background-color: #e63c5c;
+}
+
+/* Stats Section */
+#stats-container {
+  margin: 20px 0;
+}
+
+#stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+}
+
+.stat-card span:first-child {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.stat-card span:last-child {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Filter Section */
+#filter-container {
+  margin: 20px 0;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+#search-email {
+  flex: 1;
+}
+
+#filter-status {
+  width: 200px;
+}
+
+/* Button Variants */
+#users-table button {
+  margin: 5px;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+#users-table button:nth-child(1) { /* Submissions */
+  background-color: #34c759;
+}
+
+#users-table button:nth-child(1):hover {
+  background-color: #2db14f;
+}
+
+#users-table button:nth-child(2) { /* Edit */
+  background-color: #4361ee;
+}
+
+#users-table button:nth-child(2):hover {
+  background-color: #3f37c9;
+}
+
+#users-table button:nth-child(3) { /* Logs */
+  background-color: #6c757d;
+}
+
+#users-table button:nth-child(3):hover {
+  background-color: #5a6268;
+}
+
+#users-table button:nth-child(4) { /* Logout */
+  background-color: #ff4b6b;
+}
+
+#users-table button:nth-child(4):hover {
+  background-color: #e63c5c;
+}
+
+#users-table button:nth-child(5) { /* Delete */
+  background-color: #dc3545;
+}
+
+#users-table button:nth-child(5):hover {
+  background-color: #c82333;
 }
