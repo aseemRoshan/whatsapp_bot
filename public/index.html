@@ -35,7 +35,7 @@
             console.log('Logged in as:', user.displayName);
             user.getIdToken().then((idToken) => {
               localStorage.setItem('idToken', idToken);
-              checkUserStatus(idToken); // Call the new function
+              checkUserStatus(idToken);
             });
           })
           .catch((error) => {
@@ -45,6 +45,8 @@
       }
     };
   </script>
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Login Container -->
   <div id="login-container">
@@ -113,6 +115,7 @@
     <button onclick="addStudent()">Add Student</button>
     <button onclick="saveSetup()">Save and Start</button>
     <button id="stop-bot" onclick="stopBot()" style="display: none;">Stop Bot</button>
+    <button id="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <script src="script.js"></script>

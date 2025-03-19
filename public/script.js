@@ -274,3 +274,40 @@ function stopBot() {
       .catch(err => console.error('Error stopping bot:', err));
   }
 }
+
+function logout() {
+  Swal.fire({
+    title: 'Are you sure you want to logout?',
+    text: 'This will stop the bot and end your current session. Your WhatsApp connection and setup data will be preserved, but you’ll need to log in again to resume.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#4361ee',
+    cancelButtonColor: '#ff4b6b',
+    confirmButtonText: 'Yes, logout',
+    cancelButtonText: 'No, stay logged in'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const idToken = localStorage.getItem('idToken');
+      fetch('/logout', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            localStorage.removeItem('idToken');
+            window.location.reload();
+          } else {
+            Swal.fire('Error', data.error, 'error');
+          }
+        })
+        .catch(err => {
+          console.error('Error during logout:', err);
+          Swal.fire('Error', 'Something went wrong during logout.', 'error');
+        });
+    }
+  });
+}
