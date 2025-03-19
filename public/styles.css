@@ -31,7 +31,7 @@ body {
 }
 
 /* Container Styles */
-#qr-container, #setup-container {
+#login-container, #qr-container, #setup-container, #loading-container {
   max-width: 800px;
   margin: 40px auto;
   padding: 40px;
@@ -42,7 +42,7 @@ body {
   overflow: hidden;
 }
 
-#qr-container::before, #setup-container::before {
+#qr-container::before, #setup-container::before, #login-container::before, #loading-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -100,9 +100,9 @@ h2 {
 /* Form Elements */
 label {
   display: block;
-  margin: 18px 0 10px;
-  font-weight: 600;
-  color: var(--text-primary);
+  margin: 15px 0 8px;
+  font-weight: 500;
+  color: #444;
   text-align: left;
   font-size: 16px;
 }
@@ -126,9 +126,25 @@ input:focus, select:focus {
   box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
 }
 
-input[type="time"] {
+input#batch {
   width: 200px;
-  font-family: inherit;
+}
+
+/* Time Input Group */
+.time-input-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.time-input-group input[type="number"] {
+  width: 50px;
+  padding: 8px;
+  text-align: center;
+}
+
+.time-input-group select {
+  padding: 8px;
 }
 
 /* Students List */
@@ -224,49 +240,43 @@ button[onclick="saveSetup()"] {
   margin-left: auto;
   margin-right: auto;
   border-radius: 14px;
-  position: relative;
-  overflow: hidden;
 }
 
-button[onclick="saveSetup()"]::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-button[onclick="saveSetup()"]::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
+button#stop-bot {
+  background-color: #ff4b6b;
+  margin-top: 25px;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  display: block;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: 0.5s;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-button[onclick="saveSetup()"]::before {
-  animation: shimmer 2s infinite;
-}
-  
-@keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+button#stop-bot:hover {
+  background-color: #e63c5c;
 }
 
-button[onclick="saveSetup()"]::after:hover {
-  opacity: 1;
+#google-login {
+  background-color: #4285f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#google-login:hover {
+  background-color: #357abd;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  #qr-container, #setup-container {
+  #qr-container, #setup-container, #login-container, #loading-container {
     margin: 20px 10px;
     padding: 30px;
     border-radius: 14px;
@@ -308,7 +318,6 @@ button[onclick="saveSetup()"]::after:hover {
   animation: fadeIn 0.6s cubic-bezier(0.26, 0.86, 0.44, 0.985);
 }
 
-/* Improve select dropdowns */
 select {
   appearance: none;
   -webkit-appearance: none;
@@ -318,19 +327,15 @@ select {
   padding-right: 40px;
 }
 
-/* Better focus states for accessibility */
 button:focus, input:focus, select:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
 }
 
-/* Enhanced QR container */
-#qr-container {
+#qr-container, #login-container, #loading-container {
   text-align: center;
-  position: relative;
 }
 
-/* Loading state for QR */
 @keyframes pulse {
   0% { opacity: 0.6; }
   50% { opacity: 1; }
@@ -340,52 +345,4 @@ button:focus, input:focus, select:focus {
 #qr-code:not([src]) {
   background-color: rgba(0, 0, 0, 0.05);
   animation: pulse 1.5s infinite;
-}
-button#stop-bot {
-  background-color: #ff4b6b;
-  margin-top: 25px;
-  padding: 16px 32px;
-  font-size: 18px;
-  font-weight: 600;
-  display: block;
-  width: 100%;
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-button#stop-bot:hover {
-  background-color: #e63c5c;
-}
-input#batch {
-  width: 200px; /* Match the width of time inputs for consistency */
-}
-.time-input-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.time-input-group input[type="number"] {
-  width: 50px; /* Smaller width for hours and minutes */
-  padding: 8px;
-  text-align: center;
-}
-
-.time-input-group select {
-  padding: 8px;
-}
-
-/* Adjust label to align with new layout */
-label {
-  display: block;
-  margin: 15px 0 8px;
-  font-weight: 500;
-  color: #444;
-  text-align: left;
-}
-
-/* Wrap time inputs in a div for each label */
-label .time-input-group {
-  margin-top: 5px;
 }

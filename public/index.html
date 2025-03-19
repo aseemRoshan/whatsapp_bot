@@ -8,12 +8,63 @@
 </head>
 <body>
   <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
-  <div id="qr-container">
+    const firebaseConfig = {
+      apiKey: "AIzaSyDS0qKDw0NIZqt9YLkceLJgM19U1-DjGx4",
+      authDomain: "whatsapp-audio-tracker.firebaseapp.com",
+      projectId: "whatsapp-audio-tracker",
+      storageBucket: "whatsapp-audio-tracker.appspot.com",
+      messagingSenderId: "317245778478",
+      appId: "1:317245778478:web:f2f8b62d323561cf208dbf"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    console.log('Firebase initialized');
+
+    window.firebaseAuth = {
+      signInWithGoogle: () => {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            const user = result.user;
+            console.log('Logged in as:', user.displayName);
+            user.getIdToken().then((idToken) => {
+              localStorage.setItem('idToken', idToken);
+              checkUserStatus(idToken); // Call the new function
+            });
+          })
+          .catch((error) => {
+            console.error('Login failed:', error.message);
+            alert('Login failed: ' + error.message);
+          });
+      }
+    };
+  </script>
+
+  <!-- Login Container -->
+  <div id="login-container">
+    <h1>Login to WhatsApp Task Tracker</h1>
+    <button id="google-login">Sign in with Google</button>
+  </div>
+
+  <!-- Loading Container -->
+  <div id="loading-container" style="display: none;">
+    <h1>Loading...</h1>
+  </div>
+
+  <!-- QR Code Container (hidden initially) -->
+  <div id="qr-container" style="display: none;">
     <h1>Scan QR Code</h1>
     <img id="qr-code" alt="WhatsApp QR Code">
     <p>Scan this with your WhatsApp to connect.</p>
   </div>
+
+  <!-- Setup Container (hidden initially) -->
   <div id="setup-container" style="display: none;">
     <h1>Setup Task Tracker</h1>
     <label>Group: 
@@ -23,22 +74,26 @@
     </label><br>
     <label>Batch: <input type="text" id="batch" placeholder="e.g., BCK221 A" value="BCK221 A"></label><br>
     <label>Report Time (Submission Deadline): 
-      <input type="number" id="report-hours" min="1" max="12" value="7" placeholder="HH">
-      :
-      <input type="number" id="report-minutes" min="0" max="59" value="40" placeholder="MM">
-      <select id="report-period">
-        <option value="AM">AM</option>
-        <option value="PM" selected>PM</option>
-      </select>
+      <div class="time-input-group">
+        <input type="number" id="report-hours" min="1" max="12" value="7" placeholder="HH">
+        :
+        <input type="number" id="report-minutes" min="0" max="59" value="40" placeholder="MM">
+        <select id="report-period">
+          <option value="AM">AM</option>
+          <option value="PM" selected>PM</option>
+        </select>
+      </div>
     </label><br>
     <label>Submission Start Time: 
-      <input type="number" id="start-hours" min="1" max="12" value="9" placeholder="HH">
-      :
-      <input type="number" id="start-minutes" min="0" max="59" value="00" placeholder="MM">
-      <select id="start-period">
-        <option value="AM" selected>AM</option>
-        <option value="PM">PM</option>
-      </select>
+      <div class="time-input-group">
+        <input type="number" id="start-hours" min="1" max="12" value="9" placeholder="HH">
+        :
+        <input type="number" id="start-minutes" min="0" max="59" value="00" placeholder="MM">
+        <select id="start-period">
+          <option value="AM" selected>AM</option>
+          <option value="PM">PM</option>
+        </select>
+      </div>
     </label><br>
     <h2>Add Students</h2>
     <div id="students-list">
@@ -59,79 +114,7 @@
     <button onclick="saveSetup()">Save and Start</button>
     <button id="stop-bot" onclick="stopBot()" style="display: none;">Stop Bot</button>
   </div>
+
   <script src="script.js"></script>
-
-  <script>
-    const socket = io('http://localhost:3000');
-    console.log('Socket.IO initialized');
-
-    socket.on('connect', () => {
-      console.log('Connected to Socket.IO server');
-    });
-
-    socket.on('qr', (data) => {
-      console.log('QR received:', data);
-      document.getElementById('qr-code').src = data.qr;
-    });
-
-    socket.on('authenticated', (data) => {
-      console.log('Authenticated event received:', data);
-      document.getElementById('qr-container').style.display = 'none';
-      document.getElementById('setup-container').style.display = 'block';
-
-      const groupSelect = document.getElementById('group-id');
-      console.log('Groups from server:', data.groups);
-      if (!data.groups || data.groups.length === 0) {
-        console.log('No groups received');
-        const option = document.createElement('option');
-        option.value = '';
-        option.text = 'No groups found';
-        groupSelect.appendChild(option);
-      } else {
-        data.groups.forEach(group => {
-          console.log('Adding group:', group);
-          const option = document.createElement('option');
-          option.value = group.id;
-          option.text = group.name || 'Unnamed Group';
-          groupSelect.appendChild(option);
-        });
-      }
-
-      window.contacts = data.contacts || [];
-      console.log('Contacts stored:', window.contacts.length);
-
-      const studentSelect = document.querySelector('.student-whatsapp');
-      if (!data.contacts || data.contacts.length === 0) {
-        console.log('No contacts received');
-      } else {
-        data.contacts.forEach(contact => {
-          console.log('Adding contact:', contact);
-          const option = document.createElement('option');
-          option.value = contact.id;
-          option.text = contact.name;
-          studentSelect.appendChild(option);
-        });
-      }
-
-      document.querySelectorAll('.input-type').forEach(select => {
-        select.addEventListener('change', toggleInputType);
-      });
-
-      console.log('Setup UI should now be visible');
-    });
-
-    function toggleInputType(event) {
-      const studentEntry = event.target.closest('.student-entry');
-      const contactInput = studentEntry.querySelector('.contact-input');
-      const manualInput = studentEntry.querySelector('.manual-input');
-      if (event.target.value === 'contact') {
-        contactInput.style.display = 'block';
-        manualInput.style.display = 'none';
-      } else {
-        contactInput.style.display = 'none';
-        manualInput.style.display = 'block';
-      }
-    }
-  </script>
 </body>
 </html>

@@ -1,3 +1,150 @@
+const socket = io('http://localhost:3000');
+console.log('Socket.IO initialized');
+
+const loginButton = document.getElementById('google-login');
+loginButton.addEventListener('click', () => {
+  if (window.firebaseAuth && window.firebaseAuth.signInWithGoogle) {
+    window.firebaseAuth.signInWithGoogle();
+  } else {
+    console.error('Firebase authentication not initialized yet');
+    alert('Please wait a moment and try again.');
+  }
+});
+
+socket.on('connect', () => {
+  console.log('Connected to Socket.IO server');
+});
+
+socket.on('qr', (data) => {
+  console.log('QR received:', data);
+  document.getElementById('qr-code').src = data.qr;
+});
+
+socket.on('authenticated', (data) => {
+  console.log('Authenticated event received:', data);
+  document.getElementById('qr-container').style.display = 'none';
+  document.getElementById('setup-container').style.display = 'block';
+  loadSetupData(null, data.groups, data.contacts);
+});
+
+function checkUserStatus(idToken) {
+  document.getElementById('login-container').style.display = 'none';
+  document.getElementById('loading-container').style.display = 'block';
+
+  fetch('/user-status', {
+    method: 'GET',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('loading-container').style.display = 'none';
+      if (data.authenticated && data.hasSetup) {
+        document.getElementById('setup-container').style.display = 'block';
+        loadSetupData(data.setup, data.groups, data.contacts);
+        if (data.setup.isBotRunning) {
+          document.getElementById('stop-bot').style.display = 'block';
+        }
+      } else if (data.authenticated) {
+        document.getElementById('setup-container').style.display = 'block';
+        loadSetupData(null, data.groups, data.contacts);
+      } else {
+        document.getElementById('qr-container').style.display = 'block';
+        if (data.qr) document.getElementById('qr-code').src = data.qr;
+      }
+    })
+    .catch(err => {
+      console.error('Error checking user status:', err);
+      document.getElementById('loading-container').style.display = 'none';
+      document.getElementById('login-container').style.display = 'block';
+    });
+}
+
+function loadSetupData(setup, groups, contacts) {
+  const groupSelect = document.getElementById('group-id');
+  groupSelect.innerHTML = '<option value="">Select a group</option>';
+  groups.forEach(group => {
+    const option = document.createElement('option');
+    option.value = group.id;
+    option.text = group.name || 'Unnamed Group';
+    groupSelect.appendChild(option);
+  });
+
+  window.contacts = contacts || [];
+  const studentSelect = document.querySelector('.student-whatsapp');
+  studentSelect.innerHTML = '<option value="">Select a contact</option>';
+  contacts.forEach(contact => {
+    const option = document.createElement('option');
+    option.value = contact.id;
+    option.text = contact.name;
+    studentSelect.appendChild(option);
+  });
+
+  if (setup) {
+    document.getElementById('group-id').value = setup.groupId || '';
+    document.getElementById('batch').value = setup.batch || '';
+
+    const [reportHours, reportMinutes] = setup.reportTime.split(':').map(Number);
+    const [startHours, startMinutes] = setup.startTime.split(':').map(Number);
+    
+    document.getElementById('report-hours').value = reportHours % 12 || 12;
+    document.getElementById('report-minutes').value = reportMinutes;
+    document.getElementById('report-period').value = reportHours >= 12 ? 'PM' : 'AM';
+    
+    document.getElementById('start-hours').value = startHours % 12 || 12;
+    document.getElementById('start-minutes').value = startMinutes;
+    document.getElementById('start-period').value = startHours >= 12 ? 'PM' : 'AM';
+
+    const studentsList = document.getElementById('students-list');
+    studentsList.innerHTML = '';
+    setup.students.forEach(student => {
+      const studentDiv = document.createElement('div');
+      studentDiv.className = 'student-entry';
+      studentDiv.innerHTML = `
+        <input type="text" placeholder="Name" class="student-name" value="${student.name}">
+        <select class="input-type">
+          <option value="contact" ${student.whatsappId.endsWith('@c.us') && contacts.some(c => c.id === student.whatsappId) ? 'selected' : ''}>Select Contact</option>
+          <option value="manual" ${!contacts.some(c => c.id === student.whatsappId) ? 'selected' : ''}>Enter Number</option>
+        </select>
+        <select class="student-whatsapp contact-input" style="display: ${student.whatsappId.endsWith('@c.us') && contacts.some(c => c.id === student.whatsappId) ? 'block' : 'none'};">
+          <option value="">Select a contact</option>
+        </select>
+        <input type="tel" class="student-number manual-input" placeholder="Enter phone number (e.g., 9123456789)" style="display: ${!contacts.some(c => c.id === student.whatsappId) ? 'block' : 'none'};" value="${student.whatsappId.startsWith('91') && student.whatsappId.endsWith('@c.us') ? student.whatsappId.slice(2, -5) : ''}">
+        <button onclick="removeStudent(this)">Remove</button>
+      `;
+      const select = studentDiv.querySelector('.student-whatsapp');
+      contacts.forEach(contact => {
+        const option = document.createElement('option');
+        option.value = contact.id;
+        option.text = contact.name;
+        if (contact.id === student.whatsappId) option.selected = true;
+        select.appendChild(option);
+      });
+      studentsList.appendChild(studentDiv);
+      studentDiv.querySelector('.input-type').addEventListener('change', toggleInputType);
+    });
+  }
+
+  document.querySelectorAll('.input-type').forEach(select => {
+    select.addEventListener('change', toggleInputType);
+  });
+}
+
+function toggleInputType(event) {
+  const studentEntry = event.target.closest('.student-entry');
+  const contactInput = studentEntry.querySelector('.contact-input');
+  const manualInput = studentEntry.querySelector('.manual-input');
+  if (event.target.value === 'contact') {
+    contactInput.style.display = 'block';
+    manualInput.style.display = 'none';
+  } else {
+    contactInput.style.display = 'none';
+    manualInput.style.display = 'block';
+  }
+}
+
 function addStudent() {
   const studentDiv = document.createElement('div');
   studentDiv.className = 'student-entry';
@@ -82,9 +229,13 @@ function saveSetup() {
   }
 
   console.log('Saving setup:', { groupId, batch, reportTime, startTime, students });
+  const idToken = localStorage.getItem('idToken');
   fetch('/setup', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    },
     body: JSON.stringify({ groupId, batch, reportTime, startTime, students })
   })
     .then(response => response.json())
@@ -102,9 +253,13 @@ function saveSetup() {
 
 function stopBot() {
   if (confirm('Are you sure you want to stop the bot?')) {
+    const idToken = localStorage.getItem('idToken');
     fetch('/stop', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      }
     })
       .then(response => response.json())
       .then(data => {
