@@ -40,6 +40,9 @@ function checkUserStatus(idToken) {
   })
     .then(response => response.json())
     .then(data => {
+      const userId = JSON.parse(atob(idToken.split('.')[1])).sub; // Extract userId from token
+      socket.emit('register-user', userId); // Register user with Socket.IO
+
       document.getElementById('loading-container').style.display = 'none';
       if (data.authenticated && data.hasSetup) {
         document.getElementById('setup-container').style.display = 'block';
@@ -288,7 +291,7 @@ function logout() {
   }).then((result) => {
     if (result.isConfirmed) {
       const idToken = localStorage.getItem('idToken');
-      fetch('/logout', {
+      fetch('/logout', { // Note: You need to add this endpoint in index.js
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
