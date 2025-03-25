@@ -49,25 +49,36 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Login Container -->
-<!-- Login Container -->
-<!-- Login Container -->
-<div id="login-container">
-  <div class="logo-placeholder">TS</div>
-  <h1 style="padding-left: 30px;">Welcome to TaskSync</h1>
-  <p>Manage tasks effortlessly via WhatsApp</p>
-  <button id="google-login">Sign in with Google</button>
-</div>
-
-  <!-- Loading Container -->
-  <div id="loading-container" style="display: none;">
-    <h1>Loading...</h1>
+  <div id="login-container">
+    <div class="logo-placeholder">TS</div>
+    <h1 style="padding-left: 30px;">Welcome to TaskSync</h1>
+    <p>Manage tasks effortlessly via WhatsApp</p>
+    <button id="google-login">Sign in with Google</button>
   </div>
+
+  <!-- Loading Container (Removed, replaced by Connecting Container) -->
+  <!-- <div id="loading-container" style="display: none;">
+    <h1>Loading...</h1>
+  </div> -->
 
   <!-- QR Code Container (hidden initially) -->
   <div id="qr-container" style="display: none;">
     <h1>Scan QR Code</h1>
-    <img id="qr-code" alt="WhatsApp QR Code">
+    <div id="qr-loading" class="spinner-container">
+      <div class="spinner"></div>
+      <p>Please wait, QR code will be generated soon...</p>
+    </div>
+    <img id="qr-code" alt="WhatsApp QR Code" style="display: none;">
     <p>Scan this with your WhatsApp to connect.</p>
+  </div>
+
+  <!-- Connecting Container (used for all loading states post-login) -->
+  <div id="connecting-container" style="display: none;">
+    <h1>Connecting...</h1>
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p>Please wait a while, we’re fetching your WhatsApp data...</p>
+    </div>
   </div>
 
   <!-- Setup Container (hidden initially) -->

@@ -1,2 +1,3 @@
-2025/03/22-13:08:03.924 9e60 Creating DB C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\shared_proto_db since it was missing.
-2025/03/22-13:08:03.931 9e60 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\shared_proto_db/MANIFEST-000001
+2025/03/24-16:55:41.325 c808 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\shared_proto_db/MANIFEST-000001
+2025/03/24-16:55:41.334 c808 Recovering log #3
+2025/03/24-16:55:41.334 c808 Reusing old log C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\shared_proto_db/000003.log 

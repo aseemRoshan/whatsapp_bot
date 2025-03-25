@@ -1,0 +1,4 @@
+2025/03/25-11:55:05.541 c37c Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/03/25-11:55:05.541 c37c Recovering log #1515
+2025/03/25-11:55:05.576 c37c Reusing old log C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/001515.log 
+2025/03/25-11:55:07.173 bac4 Manual compaction at level-0 from '\x00 \x00\x00\x00' @ 72057594037927935 : 1 .. '\x00!\x00\x00\x00' @ 0 : 0; will stop at (end)

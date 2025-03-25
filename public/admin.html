@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - WhatsApp Task Tracker</title>
+  <title>TaskSync Admin Panel</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-    import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyDS0qKDw0NIZqt9YLkceLJgM19U1-DjGx4",
@@ -24,369 +23,55 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    console.log('Firebase initialized');
 
-    window.adminAuth = {
-      signIn: (email, password) => {
-        signInWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            const user = userCredential.user;
+    window.firebaseAuth = {
+      signInWithGoogle: () => {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            const user = result.user;
+            console.log('Logged in as:', user.displayName);
             user.getIdToken().then((idToken) => {
-              localStorage.setItem('adminIdToken', idToken);
-              loadDashboard(idToken);
+              localStorage.setItem('idToken', idToken);
+              checkAdminStatus(idToken);
             });
           })
           .catch((error) => {
-            Swal.fire('Login Failed', error.message, 'error');
+            console.error('Login failed:', error.message);
+            alert('Login failed: ' + error.message);
           });
       }
     };
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Admin Login Container -->
   <div id="admin-login-container">
-    <h1>Admin Login</h1>
-    <input type="email" id="admin-email" placeholder="Email">
-    <input type="password" id="admin-password" placeholder="Password">
-    <button id="admin-login-btn" onclick="adminLogin()">Login</button>
+    <div class="logo-placeholder">TS</div>
+    <h1 style="padding-left: 30px;">TaskSync Admin Login</h1>
+    <p>Admin access only</p>
+    <button id="google-login">Sign in with Google</button>
+    <p><a href="/index.html">Back to User Setup</a></p>
   </div>
 
-  <!-- Admin Dashboard Container -->
-  <div id="admin-dashboard" style="display: none;">
-    <h1>Admin Dashboard</h1>
-    <button onclick="adminLogout()">Logout</button>
-    
-    <!-- Stats Section -->
-    <div id="stats-container">
-      <h2>Statistics</h2>
-      <div id="stats">
-        <div class="stat-card"><span>Total Users:</span> <span id="total-users">0</span></div>
-        <div class="stat-card"><span>Active Bots:</span> <span id="active-bots">0</span></div>
-        <div class="stat-card"><span>Submissions Today:</span> <span id="submissions-today">0</span></div>
-      </div>
-    </div>
-
-    <!-- Search and Filter -->
-    <div id="filter-container">
-      <h2>Users</h2>
-      <input type="text" id="search-email" placeholder="Search by email" onkeyup="filterUsers()">
-      <select id="filter-status" onchange="filterUsers()">
-        <option value="">All Status</option>
-        <option value="running">Bot Running</option>
-        <option value="stopped">Bot Stopped</option>
-      </select>
-    </div>
-
-    <!-- Users Table -->
+  <!-- Admin Panel Container -->
+  <div id="admin-panel-container" style="display: none;">
+    <h1>Admin Panel</h1>
+    <button id="logout-btn" onclick="logout()">Logout</button>
     <table>
       <thead>
         <tr>
           <th>Email</th>
-          <th>Batch</th>
-          <th>Group ID</th>
-          <th>Bot Status</th>
-          <th>Last Login</th>
+          <th>Name</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody id="users-table"></tbody>
+      <tbody id="user-list"></tbody>
     </table>
   </div>
 
-  <script>
-    const socket = io('http://localhost:3000');
-    let allUsers = [];
-
-    function adminLogin() {
-      const email = document.getElementById('admin-email').value;
-      const password = document.getElementById('admin-password').value;
-      if (!email || !password) {
-        Swal.fire('Error', 'Please enter email and password', 'error');
-        return;
-      }
-      window.adminAuth.signIn(email, password);
-    }
-
-    function loadDashboard(idToken) {
-      document.getElementById('admin-login-container').style.display = 'none';
-      document.getElementById('admin-dashboard').style.display = 'block';
-
-      fetchStats(idToken);
-      fetchUsers(idToken);
-
-      socket.on('userUpdate', (data) => {
-        fetchUsers(idToken); // Refresh users on real-time update
-      });
-    }
-
-    function fetchStats(idToken) {
-      fetch('/admin/stats', {
-        headers: { 'Authorization': `Bearer ${idToken}` }
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            document.getElementById('total-users').textContent = data.stats.totalUsers;
-            document.getElementById('active-bots').textContent = data.stats.activeBots;
-            document.getElementById('submissions-today').textContent = data.stats.submissionsToday;
-          }
-        })
-        .catch(err => console.error('Error fetching stats:', err));
-    }
-
-    function fetchUsers(idToken) {
-      fetch('/admin/users', {
-        headers: { 'Authorization': `Bearer ${idToken}` }
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            allUsers = data.users;
-            renderUsers(idToken);
-          } else {
-            Swal.fire('Error', data.error, 'error');
-          }
-        })
-        .catch(err => {
-          console.error('Error loading users:', err);
-          Swal.fire('Error', 'Failed to load users', 'error');
-        });
-    }
-
-    function renderUsers(idToken) {
-      const tbody = document.getElementById('users-table');
-      tbody.innerHTML = '';
-      const searchEmail = document.getElementById('search-email').value.toLowerCase();
-      const filterStatus = document.getElementById('filter-status').value;
-
-      allUsers
-        .filter(user => 
-          user.email.toLowerCase().includes(searchEmail) &&
-          (filterStatus === '' || 
-           (filterStatus === 'running' && user.isBotRunning) || 
-           (filterStatus === 'stopped' && !user.isBotRunning))
-        )
-        .forEach(user => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${user.email}</td>
-            <td>${user.batch || 'N/A'}</td>
-            <td>${user.groupId || 'N/A'}</td>
-            <td>
-              <button onclick="${user.isBotRunning ? 'stopBot' : 'startBot'}('${user.uid}', '${idToken}')">
-                ${user.isBotRunning ? 'Stop Bot' : 'Start Bot'}
-              </button>
-            </td>
-            <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'N/A'}</td>
-            <td>
-              <button onclick="viewSubmissions('${user.uid}', '${idToken}')">Submissions</button>
-              <button onclick="editSetup('${user.uid}', '${idToken}')">Edit</button>
-              <button onclick="viewLogs('${user.uid}', '${idToken}')">Logs</button>
-              <button onclick="logoutUser('${user.uid}', '${idToken}')">Logout</button>
-              <button onclick="deleteUser('${user.uid}', '${idToken}')">Delete</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-    }
-
-    function filterUsers() {
-      renderUsers(localStorage.getItem('adminIdToken'));
-    }
-
-    function viewSubmissions(userId, idToken) {
-      fetch(`/admin/user-submissions?userId=${userId}`, {
-        headers: { 'Authorization': `Bearer ${idToken}` }
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            const submissionText = data.submissions.map(sub => `
-              Date: ${sub.date}
-              Submitted: ${sub.submitted.join(', ') || 'None'}
-              Not Submitted: ${sub.notSubmitted.join(', ') || 'None'}
-            `).join('\n\n');
-            Swal.fire('Submissions', submissionText || 'No submissions yet', 'info');
-          } else {
-            Swal.fire('Error', data.error, 'error');
-          }
-        })
-        .catch(err => Swal.fire('Error', 'Failed to fetch submissions', 'error'));
-    }
-
-    function editSetup(userId, idToken) {
-      fetch(`/admin/user-setup/${userId}`, {
-        headers: { 'Authorization': `Bearer ${idToken}` }
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            Swal.fire({
-              title: 'Edit User Setup',
-              html: `
-                <label>Group: 
-                  <select id="edit-group-id">
-                    <option value="">Select a group</option>
-                    ${data.groups.map(g => `<option value="${g.id}" ${g.id === data.setup.groupId ? 'selected' : ''}>${g.name}</option>`).join('')}
-                  </select>
-                </label><br>
-                <label>Batch: <input type="text" id="edit-batch" value="${data.setup.batch || ''}"></label><br>
-                <label>Report Time: <input type="time" id="edit-report-time" value="${data.setup.reportTime || ''}"></label><br>
-                <label>Start Time: <input type="time" id="edit-start-time" value="${data.setup.startTime || ''}"></label><br>
-                <label>Students (JSON): <textarea id="edit-students">${JSON.stringify(data.setup.students, null, 2)}</textarea></label>
-              `,
-              showCancelButton: true,
-              confirmButtonText: 'Save',
-              preConfirm: () => {
-                const groupId = document.getElementById('edit-group-id').value;
-                const batch = document.getElementById('edit-batch').value;
-                const reportTime = document.getElementById('edit-report-time').value;
-                const startTime = document.getElementById('edit-start-time').value;
-                let students;
-                try {
-                  students = JSON.parse(document.getElementById('edit-students').value);
-                } catch (e) {
-                  Swal.showValidationMessage('Invalid students JSON');
-                  return false;
-                }
-                return { userId, groupId, batch, reportTime, startTime, students };
-              }
-            }).then(result => {
-              if (result.isConfirmed) {
-                fetch('/admin/update-setup', {
-                  method: 'PUT',
-                  headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-                  body: JSON.stringify(result.value)
-                })
-                  .then(response => response.json())
-                  .then(data => {
-                    if (data.success) {
-                      Swal.fire('Success', 'Setup updated', 'success').then(() => fetchUsers(idToken));
-                    } else {
-                      Swal.fire('Error', data.error, 'error');
-                    }
-                  })
-                  .catch(err => Swal.fire('Error', 'Failed to update setup', 'error'));
-              }
-            });
-          } else {
-            Swal.fire('Error', data.error, 'error');
-          }
-        })
-        .catch(err => Swal.fire('Error', 'Failed to fetch setup', 'error'));
-    }
-
-    function startBot(userId, idToken) {
-      fetch('/admin/start-bot', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId })
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            Swal.fire('Success', 'Bot started', 'success').then(() => fetchUsers(idToken));
-          } else {
-            Swal.fire('Error', data.error, 'error');
-          }
-        })
-        .catch(err => Swal.fire('Error', 'Failed to start bot', 'error'));
-    }
-
-    function stopBot(userId, idToken) {
-      fetch('/stop', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken, userId })
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            Swal.fire('Success', 'Bot stopped', 'success').then(() => fetchUsers(idToken));
-          } else {
-            Swal.fire('Error', data.error, 'error');
-          }
-        })
-        .catch(err => Swal.fire('Error', 'Failed to stop bot', 'error'));
-    }
-
-    function viewLogs(userId, idToken) {
-      fetch(`/admin/user-logs?userId=${userId}`, {
-        headers: { 'Authorization': `Bearer ${idToken}` }
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            const logText = data.logs.map(log => `${new Date(log.timestamp).toLocaleString()}: ${log.action}`).join('\n');
-            Swal.fire('Activity Logs', logText || 'No logs yet', 'info');
-          } else {
-            Swal.fire('Error', data.error, 'error');
-          }
-        })
-        .catch(err => Swal.fire('Error', 'Failed to fetch logs', 'error'));
-    }
-
-    function logoutUser(userId, idToken) {
-      Swal.fire({
-        title: 'Logout User?',
-        text: `This will stop the bot for ${userId}.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, logout'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch('/admin/logout-user', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId })
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                Swal.fire('Success', 'User logged out', 'success').then(() => fetchUsers(idToken));
-              } else {
-                Swal.fire('Error', data.error, 'error');
-              }
-            })
-            .catch(err => Swal.fire('Error', 'Failed to logout user', 'error'));
-        }
-      });
-    }
-
-    function deleteUser(userId, idToken) {
-      Swal.fire({
-        title: 'Delete User?',
-        text: `This will permanently delete ${userId} and all associated data.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch('/admin/delete-user', {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId })
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                Swal.fire('Success', 'User deleted', 'success').then(() => fetchUsers(idToken));
-              } else {
-                Swal.fire('Error', data.error, 'error');
-              }
-            })
-            .catch(err => Swal.fire('Error', 'Failed to delete user', 'error'));
-        }
-      });
-    }
-
-    function adminLogout() {
-      localStorage.removeItem('adminIdToken');
-      window.location.reload();
-    }
-
-    // Check if already logged in
-    const idToken = localStorage.getItem('adminIdToken');
-    if (idToken) loadDashboard(idToken);
-  </script>
+  <script src="admin.js"></script>
 </body>
 </html>
