@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 2025/03/19-17:18:20.935 5914 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-EgAbiKuaA1NmpFx7B9mYb8rPqQt1\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
 2025/03/19-17:18:20.936 5914 Recovering log #84
 2025/03/19-17:18:20.953 5914 Reusing old log C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-EgAbiKuaA1NmpFx7B9mYb8rPqQt1\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000084.log 
@@ -180,3 +181,39 @@
 2025/03/19-17:18:22.906 4ec4 compacted to: files[ 0 1 1 0 0 0 0 ]
 2025/03/19-17:18:22.906 4ec4 Delete type=2 #134
 2025/03/19-17:18:22.907 4ec4 Manual compaction at level-0 from '\x004\x00\x00\x05' @ 26099 : 0 .. '\x005\x00\x00\x00' @ 0 : 0; will stop at (end)
+=======
+2025/03/25-12:26:31.525 ad1c Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-EgAbiKuaA1NmpFx7B9mYb8rPqQt1\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/03/25-12:26:31.525 ad1c Recovering log #1291
+2025/03/25-12:26:31.543 ad1c Reusing old log C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-EgAbiKuaA1NmpFx7B9mYb8rPqQt1\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/001291.log 
+2025/03/25-12:26:33.618 d2b8 Level-0 table #1317: started
+2025/03/25-12:26:33.626 d2b8 Level-0 table #1317: 196331 bytes OK
+2025/03/25-12:26:33.628 d2b8 Delete type=0 #1291
+2025/03/25-12:26:33.628 d2b8 Manual compaction at level-0 from '\x00 \x00\x00\x00' @ 72057594037927935 : 1 .. '\x00!\x00\x00\x00' @ 0 : 0; will stop at '\x00 \x00\x00\x05' @ 3916885 : 1
+2025/03/25-12:26:33.629 d2b8 Compacting 1@0 + 0@1 files
+2025/03/25-12:26:33.641 d2b8 Generated table #1318@0: 4474 keys, 86814 bytes
+2025/03/25-12:26:33.657 d2b8 Generated table #1319@0: 58 keys, 3594 bytes
+2025/03/25-12:26:33.657 d2b8 Compacted 1@0 + 0@1 files => 90408 bytes
+2025/03/25-12:26:33.657 d2b8 compacted to: files[ 0 2 20 0 0 0 0 ]
+2025/03/25-12:26:33.658 d2b8 Delete type=2 #1317
+2025/03/25-12:26:33.658 d2b8 Manual compaction at level-0 from '\x00 \x00\x00\x05' @ 3916885 : 1 .. '\x00!\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/03/25-12:26:34.923 a6a4 Compacting 1@1 + 2@2 files
+2025/03/25-12:26:34.988 a6a4 Generated table #1320@1: 61781 keys, 2230183 bytes
+2025/03/25-12:26:35.039 a6a4 Generated table #1321@1: 40052 keys, 2203140 bytes
+2025/03/25-12:26:35.042 a6a4 Generated table #1322@1: 8 keys, 20278 bytes
+2025/03/25-12:26:35.042 a6a4 Compacted 1@1 + 2@2 files => 4453601 bytes
+2025/03/25-12:26:35.042 a6a4 compacted to: files[ 0 1 21 0 0 0 0 ]
+2025/03/25-12:26:35.042 a6a4 Delete type=2 #1305
+2025/03/25-12:26:35.043 a6a4 Delete type=2 #1306
+2025/03/25-12:26:35.043 a6a4 Delete type=2 #1318
+2025/03/25-12:26:36.511 a6a4 Compacting 1@1 + 8@2 files
+2025/03/25-12:26:36.563 a6a4 Generated table #1323@1: 19448 keys, 2280465 bytes
+2025/03/25-12:26:36.582 a6a4 Generated table #1324@1: 5639 keys, 2130359 bytes
+2025/03/25-12:26:36.610 a6a4 Generated table #1325@1: 4542 keys, 2125249 bytes
+2025/03/25-12:26:36.675 a6a4 Generated table #1326@1: 91478 keys, 2237903 bytes
+2025/03/25-12:26:36.749 a6a4 Generated table #1327@1: 103319 keys, 2254315 bytes
+2025/03/25-12:26:36.816 a6a4 Generated table #1328@1: 103573 keys, 2253429 bytes
+2025/03/25-12:26:36.888 a6a4 Generated table #1329@1: 103046 keys, 2253077 bytes
+2025/03/25-12:26:36.898 a6a4 Generated table #1330@1: 11744 keys, 262528 bytes
+2025/03/25-12:26:36.898 a6a4 Compacted 1@1 + 8@2 files => 15797325 bytes
+2025/03/25-12:26:36.898 a6a4 compacted to: files[ 0 0 21 0 0 0 0 ]
+>>>>>>> feature

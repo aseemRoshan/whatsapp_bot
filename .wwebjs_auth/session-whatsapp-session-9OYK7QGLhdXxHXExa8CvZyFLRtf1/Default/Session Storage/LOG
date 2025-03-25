@@ -1,2 +1,8 @@
+<<<<<<< HEAD
 2025/03/19-17:19:45.930 7d78 Creating DB C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-9OYK7QGLhdXxHXExa8CvZyFLRtf1\Default\Session Storage since it was missing.
 2025/03/19-17:19:45.935 7d78 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-9OYK7QGLhdXxHXExa8CvZyFLRtf1\Default\Session Storage/MANIFEST-000001
+=======
+2025/03/25-11:57:06.905 cf38 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-9OYK7QGLhdXxHXExa8CvZyFLRtf1\Default\Session Storage/MANIFEST-000001
+2025/03/25-11:57:06.905 cf38 Recovering log #3
+2025/03/25-11:57:06.906 cf38 Reusing old log C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-9OYK7QGLhdXxHXExa8CvZyFLRtf1\Default\Session Storage/000003.log 
+>>>>>>> feature

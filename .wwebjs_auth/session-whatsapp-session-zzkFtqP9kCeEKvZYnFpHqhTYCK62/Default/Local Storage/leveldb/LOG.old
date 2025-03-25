@@ -1,2 +1,8 @@
+<<<<<<< HEAD
 2025/03/19-17:10:50.814 9284 Creating DB C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\Local Storage\leveldb since it was missing.
 2025/03/19-17:10:50.824 9284 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\Local Storage\leveldb/MANIFEST-000001
+=======
+2025/03/25-11:58:30.897 69a0 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\Local Storage\leveldb/MANIFEST-000001
+2025/03/25-11:58:30.899 69a0 Recovering log #4
+2025/03/25-11:58:30.899 69a0 Reusing old log C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-zzkFtqP9kCeEKvZYnFpHqhTYCK62\Default\Local Storage\leveldb/000004.log 
+>>>>>>> feature

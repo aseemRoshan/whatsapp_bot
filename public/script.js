@@ -11,25 +11,48 @@ loginButton.addEventListener('click', () => {
   }
 });
 
+// Check session on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const idToken = localStorage.getItem('idToken');
+  if (idToken) {
+    console.log('Found existing idToken, checking session...');
+    checkUserStatus(idToken);
+  } else {
+    console.log('No idToken found, showing login page');
+  }
+});
+
 socket.on('connect', () => {
   console.log('Connected to Socket.IO server');
 });
 
 socket.on('qr', (data) => {
   console.log('QR received:', data);
-  document.getElementById('qr-code').src = data.qr;
+  document.getElementById('qr-loading').style.display = 'none'; // Hide spinner
+  const qrImage = document.getElementById('qr-code');
+  qrImage.src = data.qr;
+  qrImage.style.display = 'block'; // Show QR code
 });
 
 socket.on('authenticated', (data) => {
   console.log('Authenticated event received:', data);
   document.getElementById('qr-container').style.display = 'none';
-  document.getElementById('setup-container').style.display = 'block';
-  loadSetupData(null, data.groups, data.contacts);
+  document.getElementById('connecting-container').style.display = 'block'; // Show connecting spinner
+  setTimeout(() => {
+    console.log('Transitioning to setup page with data:', data);
+    document.getElementById('connecting-container').style.display = 'none';
+    document.getElementById('setup-container').style.display = 'block';
+    loadSetupData(null, data.groups, data.contacts);
+  }, 1500); // 1.5s delay for WhatsApp data fetching
+});
+
+socket.on('disconnect', () => {
+  console.log('Disconnected from Socket.IO server');
 });
 
 function checkUserStatus(idToken) {
   document.getElementById('login-container').style.display = 'none';
-  document.getElementById('loading-container').style.display = 'block';
+  document.getElementById('connecting-container').style.display = 'block'; // Show connecting spinner initially
 
   fetch('/user-status', {
     method: 'GET',
@@ -40,29 +63,43 @@ function checkUserStatus(idToken) {
   })
     .then(response => response.json())
     .then(data => {
-      document.getElementById('loading-container').style.display = 'none';
-      if (data.authenticated && data.hasSetup) {
-        document.getElementById('setup-container').style.display = 'block';
-        loadSetupData(data.setup, data.groups, data.contacts);
-        if (data.setup.isBotRunning) {
-          document.getElementById('stop-bot').style.display = 'block';
-        }
-      } else if (data.authenticated) {
-        document.getElementById('setup-container').style.display = 'block';
-        loadSetupData(null, data.groups, data.contacts);
+      const userId = JSON.parse(atob(idToken.split('.')[1])).sub; // Extract userId from token
+      console.log('User ID:', userId, 'User status:', data);
+      socket.emit('register-user', userId); // Register user with Socket.IO
+
+      if (data.authenticated) {
+        // Existing user: go directly to setup page after a short delay
+        console.log('Existing user detected, loading setup page');
+        setTimeout(() => {
+          document.getElementById('connecting-container').style.display = 'none';
+          document.getElementById('setup-container').style.display = 'block';
+          loadSetupData(data.hasSetup ? data.setup : null, data.groups, data.contacts);
+          if (data.hasSetup && data.setup.isBotRunning) {
+            document.getElementById('stop-bot').style.display = 'block';
+          }
+        }, 1000); // 1s delay to simulate fetching, adjust as needed
       } else {
+        // New user: show QR code page
+        console.log('New user, showing QR page');
+        document.getElementById('connecting-container').style.display = 'none';
         document.getElementById('qr-container').style.display = 'block';
-        if (data.qr) document.getElementById('qr-code').src = data.qr;
+        if (data.qr) {
+          document.getElementById('qr-loading').style.display = 'none';
+          document.getElementById('qr-code').src = data.qr;
+          document.getElementById('qr-code').style.display = 'block';
+        }
       }
     })
     .catch(err => {
       console.error('Error checking user status:', err);
-      document.getElementById('loading-container').style.display = 'none';
+      document.getElementById('connecting-container').style.display = 'none';
       document.getElementById('login-container').style.display = 'block';
+      localStorage.removeItem('idToken'); // Clear invalid token
     });
 }
 
 function loadSetupData(setup, groups, contacts) {
+  console.log('Loading setup data:', { setup, groups, contacts });
   const groupSelect = document.getElementById('group-id');
   groupSelect.innerHTML = '<option value="">Select a group</option>';
   groups.forEach(group => {

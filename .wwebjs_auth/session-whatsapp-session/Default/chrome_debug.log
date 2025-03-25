@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [0319/175217.543:INFO:CONSOLE(157)] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v4/yB/r/uSeJ15GYOmE.js (157)
 [0319/175220.594:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Feature xr-spatial-tracking's parameters are ignored.", source:  (0)
 [0319/175220.594:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'attribution-reporting'.", source:  (0)
@@ -23,3 +24,24 @@
 [0319/175224.241:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'private-state-token-redemption'.", source:  (0)
 [0319/175224.241:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'unload'.", source:  (0)
 [0319/175224.241:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'window-management'.", source:  (0)
+=======
+[0322/102853.538:INFO:CONSOLE(157)] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v4/yN/r/DNHj_sTOAjH.js (157)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Feature xr-spatial-tracking's parameters are ignored.", source:  (0)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'attribution-reporting'.", source:  (0)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'compute-pressure'.", source:  (0)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'interest-cohort'.", source:  (0)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'private-state-token-issuance'.", source:  (0)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'shared-storage'.", source:  (0)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'shared-storage-select-url'.", source:  (0)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'private-state-token-redemption'.", source:  (0)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'unload'.", source:  (0)
+[0322/102856.564:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'window-management'.", source:  (0)
+[0322/102858.300:INFO:CONSOLE(157)] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v4/yN/r/DNHj_sTOAjH.js (157)
+[0322/102902.825:INFO:CONSOLE(70)] "ErrorUtils caught an error:
+
+Converting to a string will drop content data. Hash="undefined" Translation="{user_name} added {names}" Content="{"key":null,"ref":null,"props":{"contact":{"id":"917510198413@c.us","pushname":"Shan.M","type":"in","isBusiness":false,"isEnterprise":false,"isSmb":false,"isContactSyncCompleted":1,"textStatusLastUpdateTime":-1,"syncToAddressbook":false},"showNotifyN" (type=object,Object)
+
+Subsequent non-fatal errors won't be logged; see https://fburl.com/debugjs. [object Object]", source: https://static.whatsapp.net/rsrc.php/v4/yK/r/1MM0lTb0mu0.js (70)
+[0322/103046.832:INFO:CONSOLE(157)] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v4/yN/r/DNHj_sTOAjH.js (157)
+[0322/103216.103:INFO:CONSOLE(157)] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v4/yN/r/DNHj_sTOAjH.js (157)
+>>>>>>> feature

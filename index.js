@@ -44,39 +44,35 @@ const authenticateToken = async (req, res, next) => {
 // Connect to MongoDB
 connectDB();
 
-// Initialize WhatsApp Client with session persistence
-const client = new Client({
-  authStrategy: new LocalAuth({ clientId: 'whatsapp-session' })
-});
-let qrCodeData = null;
-let isAuthenticated = false;
-let reportCron = {}; // Map to store cron jobs per user
+// Map to store WhatsApp clients per user
+const clients = new Map(); // Key: userId, Value: { client, isAuthenticated, qrCodeData }
+const reportCron = {}; // Map to store cron jobs per user
 
-client.on('qr', (qr) => {
-  qrcode.toDataURL(qr, (err, url) => {
-    if (err) console.error('Error generating QR code:', err);
-    else {
-      qrCodeData = url;
-      console.log('QR code generated');
-      io.emit('qr', { qr: qrCodeData });
-      console.log('Emitted QR event to frontend');
-    }
+// Function to initialize a WhatsApp client for a specific user
+function initializeClient(userId) {
+  const client = new Client({
+    authStrategy: new LocalAuth({ clientId: `whatsapp-session-${userId}` })
   });
-});
 
-io.on('connection', (socket) => {
-  console.log('Client connected');
-  socket.on('hello', (res) => {
-    console.log('Hello response:', res);
+  let qrCodeData = null;
+  let isAuthenticated = false;
+
+  client.on('qr', (qr) => {
+    qrcode.toDataURL(qr, (err, url) => {
+      if (err) console.error(`Error generating QR code for user ${userId}:`, err);
+      else {
+        qrCodeData = url;
+        console.log(`QR code generated for user ${userId}`);
+        io.to(userId).emit('qr', { qr: qrCodeData });
+      }
+    });
   });
-});
 
-client.on('ready', async () => {
-  console.log('WhatsApp Bot is ready!');
-  console.log('Authenticated user ID:', client.info.wid._serialized);
-  isAuthenticated = true;
+  client.on('ready', async () => {
+    console.log(`WhatsApp Bot is ready for user ${userId}!`);
+    isAuthenticated = true;
+    clients.set(userId, { client, isAuthenticated, qrCodeData });
 
-  if (io.sockets.sockets.size > 0) {
     const chats = await client.getChats();
     const groups = chats.filter(chat => chat.id._serialized.endsWith('@g.us')).map(group => ({
       name: group.name || 'Unnamed Group',
@@ -90,55 +86,101 @@ client.on('ready', async () => {
         id: contact.id._serialized
       }));
 
-    io.emit('authenticated', {
+    io.to(userId).emit('authenticated', {
       message: 'User authenticated successfully',
       groups,
       contacts: contactList
     });
-  }
-});
+  });
 
-client.on('message_create', async (msg) => {
-  if (!isAuthenticated) return;
-  console.log(`[DEBUG] Message created - Type: ${msg.type}, From: ${msg.from}, To: ${msg.to}, Author: ${msg.author || 'undefined'}`);
+  client.on('message_create', async (msg) => {
+    if (!isAuthenticated) return;
 
-  if (msg.hasMedia && (msg.type === 'ptt' || msg.type === 'audio')) {
-    const userSetups = await UserSetup.find({ groupId: { $in: [msg.from, msg.to] }, isBotRunning: true });
-    if (!userSetups.length) return;
+    // Determine the group ID from the message
+    const groupId = msg.to.endsWith('@g.us') ? msg.to : msg.from.endsWith('@g.us') ? msg.from : null;
+    if (!groupId) return; // Ignore non-group messages
 
-    const botUserId = client.info.wid._serialized;
-    let whatsappId = msg.author || botUserId;
+    // Fetch the user's setup only if the group matches
+    const userSetup = await UserSetup.findOne({ userId, groupId, isBotRunning: true });
+    if (!userSetup) {
+      console.log(`No active setup found for user ${userId} in group ${groupId}`);
+      return;
+    }
 
-    const now = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-    const currentDateTime = new Date(now);
-    const timeInMinutes = currentDateTime.getHours() * 60 + currentDateTime.getMinutes();
-    const submissionDate = currentDateTime.toLocaleDateString('en-GB');
+    console.log(`[DEBUG] Message processed for user ${userId} - Type: ${msg.type}, From: ${msg.from}, To: ${msg.to}, Author: ${msg.author || 'undefined'}`);
 
-    for (const userSetup of userSetups) {
+    if (msg.hasMedia && (msg.type === 'ptt' || msg.type === 'audio')) {
+      const botUserId = client.info.wid._serialized;
+      let whatsappId = msg.author || botUserId;
+
+      const now = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+      const currentDateTime = new Date(now);
+      const timeInMinutes = currentDateTime.getHours() * 60 + currentDateTime.getMinutes();
+      const submissionDate = currentDateTime.toLocaleDateString('en-GB');
+
       const [startHours, startMinutes] = userSetup.startTime.split(':').map(Number);
       const [endHours, endMinutes] = userSetup.reportTime.split(':').map(Number);
       const startTime = startHours * 60 + startMinutes;
       const endTime = endHours * 60 + endMinutes;
 
+      console.log(`[DEBUG] Time check for user ${userId}: Current ${timeInMinutes}, Window ${startTime} - ${endTime}`);
+
       if (timeInMinutes < startTime || timeInMinutes > endTime) {
-        console.log(`Audio submission from ${whatsappId} ignored - Outside valid window (${userSetup.startTime} - ${userSetup.reportTime} IST)`);
-        continue;
+        console.log(`Audio submission from ${whatsappId} ignored for user ${userId} - Outside valid window (${userSetup.startTime} - ${userSetup.reportTime} IST)`);
+        return;
       }
 
       try {
         const student = await Student.findOne({ whatsappId, batch: userSetup.batch });
         if (student) {
-          await updateSubmission(whatsappId, submissionDate, userSetup.userId);
-          console.log(`${student.name} (${whatsappId}) submitted an audio counted for ${submissionDate}`);
+          await updateSubmission(whatsappId, submissionDate, userId);
+          console.log(`${student.name} (${whatsappId}) submitted an audio counted for ${submissionDate} for user ${userId}`);
+        } else {
+          console.log(`No student found with whatsappId ${whatsappId} in batch ${userSetup.batch} for user ${userId}`);
         }
       } catch (error) {
-        console.error(`Error processing submission for ${whatsappId}:`, error);
+        console.error(`Error processing submission for ${whatsappId} for user ${userId}:`, error);
       }
     }
-  }
-});
+  });
 
-client.initialize();
+  client.on('disconnected', (reason) => {
+    console.log(`Client for user ${userId} disconnected: ${reason}`);
+    isAuthenticated = false;
+    clients.set(userId, { client, isAuthenticated, qrCodeData });
+  });
+
+  client.initialize().catch(err => console.error(`Error initializing client for user ${userId}:`, err));
+  clients.set(userId, { client, isAuthenticated, qrCodeData });
+  return client;
+}
+
+// Middleware to get user-specific client
+const getClientForUser = (req) => {
+  const userId = req.user.uid;
+  if (!clients.has(userId)) {
+    initializeClient(userId);
+  }
+  return clients.get(userId);
+};
+
+// Socket.IO connection
+io.on('connection', (socket) => {
+  console.log('Client connected');
+  socket.on('hello', (res) => {
+    console.log('Hello response:', res);
+  });
+
+  socket.on('register-user', (userId) => {
+    socket.join(userId);
+    if (!clients.has(userId)) {
+      initializeClient(userId);
+    } else if (clients.get(userId).isAuthenticated) {
+      const { client } = clients.get(userId);
+      client.emit('ready');
+    }
+  });
+});
 
 // Authentication Routes
 app.post('/auth/verify', authenticateToken, (req, res) => {
@@ -149,14 +191,15 @@ app.post('/auth/verify', authenticateToken, (req, res) => {
 app.get('/user-status', authenticateToken, async (req, res) => {
   const userId = req.user.uid;
   const userSetup = await UserSetup.findOne({ userId });
+  const userClient = getClientForUser(req);
 
-  if (isAuthenticated && userSetup && userSetup.groupId) {
-    const chats = await client.getChats();
+  if (userClient.isAuthenticated) {
+    const chats = await userClient.client.getChats();
     const groups = chats.filter(chat => chat.id._serialized.endsWith('@g.us')).map(group => ({
       name: group.name || 'Unnamed Group',
       id: group.id._serialized
     }));
-    const contacts = await client.getContacts();
+    const contacts = await userClient.client.getContacts();
     const contactList = contacts
       .filter(contact => contact.isMyContact && contact.number && contact.id._serialized.endsWith('@c.us'))
       .map(contact => ({
@@ -166,29 +209,28 @@ app.get('/user-status', authenticateToken, async (req, res) => {
 
     res.json({
       authenticated: true,
-      hasSetup: true,
-      setup: {
+      hasSetup: !!userSetup,
+      setup: userSetup ? {
         groupId: userSetup.groupId,
         batch: userSetup.batch,
         reportTime: userSetup.reportTime,
         startTime: userSetup.startTime,
         students: userSetup.students,
         isBotRunning: userSetup.isBotRunning
-      },
+      } : null,
       groups,
       contacts: contactList
     });
-  } else if (isAuthenticated) {
-    res.json({ authenticated: true, hasSetup: false });
   } else {
-    res.json({ authenticated: false, qr: qrCodeData });
+    res.json({ authenticated: false, qr: userClient.qrCodeData });
   }
 });
 
 app.get('/qr', authenticateToken, (req, res) => {
-  if (qrCodeData) {
-    res.json({ qr: qrCodeData });
-  } else if (isAuthenticated) {
+  const userClient = getClientForUser(req);
+  if (userClient.qrCodeData) {
+    res.json({ qr: userClient.qrCodeData });
+  } else if (userClient.isAuthenticated) {
     res.json({ authenticated: true });
   } else {
     res.status(503).json({ error: 'QR code not yet generated' });
@@ -196,9 +238,11 @@ app.get('/qr', authenticateToken, (req, res) => {
 });
 
 app.post('/setup', authenticateToken, async (req, res) => {
-  if (!isAuthenticated) return res.status(401).json({ error: 'Not authenticated' });
-  const { groupId, batch, reportTime, startTime, students } = req.body;
   const userId = req.user.uid;
+  const userClient = getClientForUser(req);
+  if (!userClient.isAuthenticated) return res.status(401).json({ error: 'Not authenticated' });
+
+  const { groupId, batch, reportTime, startTime, students } = req.body;
 
   if (!groupId || !batch || !reportTime || !startTime || !students || !Array.isArray(students)) {
     return res.status(400).json({ error: 'Invalid input' });
@@ -225,7 +269,7 @@ app.post('/setup', authenticateToken, async (req, res) => {
       { upsert: true, new: true }
     );
 
-    const today = new Date().toLocaleDateString('en-GB');
+    const today = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }).split(',')[0];
     await Submission.deleteMany({ date: today, batch });
     await Student.deleteMany({ batch });
     await Student.insertMany(students.map(s => ({ ...s, batch })));
@@ -233,7 +277,10 @@ app.post('/setup', authenticateToken, async (req, res) => {
     const [hours, minutes] = reportTime.split(':');
     const cronExpression = `${minutes} ${hours} * * *`;
 
-    if (reportCron[userId]) reportCron[userId].stop();
+    if (reportCron[userId]) {
+      reportCron[userId].stop();
+      delete reportCron[userId];
+    }
 
     reportCron[userId] = cron.schedule(cronExpression, () => {
       generateReport(userId);
@@ -271,6 +318,20 @@ app.post('/stop', authenticateToken, async (req, res) => {
   }
 });
 
+app.post('/logout', authenticateToken, async (req, res) => {
+  const userId = req.user.uid;
+  const userClient = clients.get(userId);
+  if (userClient) {
+    await userClient.client.destroy();
+    clients.delete(userId);
+  }
+  if (reportCron[userId]) {
+    reportCron[userId].stop();
+    delete reportCron[userId];
+  }
+  res.json({ success: true, message: 'Logged out successfully' });
+});
+
 async function updateSubmission(whatsappId, date, userId) {
   const userSetup = await UserSetup.findOne({ userId });
   if (!userSetup || !userSetup.isBotRunning) return;
@@ -281,17 +342,27 @@ async function updateSubmission(whatsappId, date, userId) {
   if (!submission.submitted.includes(whatsappId)) {
     submission.submitted.push(whatsappId);
     await submission.save();
-    console.log('Submission saved:', submission);
+    console.log(`Submission saved for user ${userId}:`, submission);
   }
 }
 
 async function generateReport(userId) {
   const userSetup = await UserSetup.findOne({ userId });
-  if (!userSetup || !userSetup.groupId || !userSetup.isBotRunning) return;
-  const today = new Date().toLocaleDateString('en-GB');
-  const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  if (!userSetup || !userSetup.groupId || !userSetup.isBotRunning) {
+    console.log(`Cannot generate report for user ${userId}: No active setup`);
+    return;
+  }
+  const userClient = clients.get(userId);
+  if (!userClient || !userClient.isAuthenticated) {
+    console.log(`Cannot generate report for user ${userId}: Client not authenticated`);
+    return;
+  }
+
+  const today = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+  const todayFormatted = new Date(today).toLocaleDateString('en-GB');
+  const dayName = new Date(today).toLocaleDateString('en-US', { weekday: 'long' });
   const students = await Student.find({ batch: userSetup.batch });
-  const submission = await Submission.findOne({ date: today, batch: userSetup.batch }) || { submitted: [] };
+  const submission = await Submission.findOne({ date: todayFormatted, batch: userSetup.batch }) || { submitted: [] };
 
   const submitted = students.filter((s) => submission.submitted.includes(s.whatsappId));
   const notSubmitted = students.filter((s) => !submission.submitted.includes(s.whatsappId));
@@ -301,7 +372,7 @@ Daily Task Report
 ------------------------------
 Batch: ${userSetup.batch}
 Day: ${dayName}
-Date: ${today}
+Date: ${todayFormatted}
 ------------------------------
 Submitted:
 ${submitted.map((s) => `✅ ${s.name}`).join('\n')}
@@ -310,8 +381,12 @@ ${notSubmitted.map((s) => `❌ ${s.name}`).join('\n')}
 Consistency leads to success. Great job to those who submitted, keep the momentum going! 🎯
   `.trim();
 
-  await client.sendMessage(userSetup.groupId, report);
-  console.log('Report sent:', report);
+  try {
+    await userClient.client.sendMessage(userSetup.groupId, report);
+    console.log(`Report sent for user ${userId}:`, report);
+  } catch (error) {
+    console.error(`Error sending report for user ${userId}:`, error);
+  }
 }
 
 server.listen(PORT, () => {

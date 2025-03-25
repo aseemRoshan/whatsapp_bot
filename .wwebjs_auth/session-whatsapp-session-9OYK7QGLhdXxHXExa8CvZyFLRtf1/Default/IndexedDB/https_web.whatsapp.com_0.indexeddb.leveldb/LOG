@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 2025/03/19-17:19:47.230 5918 Creating DB C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-9OYK7QGLhdXxHXExa8CvZyFLRtf1\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb since it was missing.
 2025/03/19-17:19:47.243 5918 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-9OYK7QGLhdXxHXExa8CvZyFLRtf1\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
 2025/03/19-17:19:48.356 7da8 Level-0 table #5: started
@@ -135,3 +136,44 @@
 2025/03/19-17:19:48.488 5918 compacted to: files[ 0 0 1 0 0 0 0 ]
 2025/03/19-17:19:48.488 5918 Delete type=2 #37
 2025/03/19-17:19:48.489 5918 Manual compaction at level-1 from '\x00\x10\x00\x00\x05' @ 1512 : 0 .. '\x00\x11\x00\x00\x00' @ 0 : 0; will stop at (end)
+=======
+2025/03/25-11:57:06.592 cf38 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-9OYK7QGLhdXxHXExa8CvZyFLRtf1\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/03/25-11:57:06.593 cf38 Recovering log #2152
+2025/03/25-11:57:06.777 cf38 Reusing old log C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session-9OYK7QGLhdXxHXExa8CvZyFLRtf1\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/002152.log 
+2025/03/25-11:57:08.324 9c50 Level-0 table #2168: started
+2025/03/25-11:57:08.341 9c50 Level-0 table #2168: 925981 bytes OK
+2025/03/25-11:57:08.342 9c50 Delete type=0 #2152
+2025/03/25-11:57:08.343 d0e8 Manual compaction at level-0 from '\x00d\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00e\x00\x00\x00' @ 0 : 0; will stop at '\x00d\x00\x00\x05' @ 7257571 : 1
+2025/03/25-11:57:08.343 d0e8 Compacting 1@0 + 0@1 files
+2025/03/25-11:57:08.367 d0e8 Generated table #2169@0: 19734 keys, 167031 bytes
+2025/03/25-11:57:08.387 d0e8 Generated table #2170@0: 16601 keys, 406177 bytes
+2025/03/25-11:57:08.387 d0e8 Compacted 1@0 + 0@1 files => 573208 bytes
+2025/03/25-11:57:08.387 d0e8 compacted to: files[ 0 2 20 0 0 0 0 ]
+2025/03/25-11:57:08.387 d0e8 Delete type=2 #2168
+2025/03/25-11:57:08.388 d0e8 Manual compaction at level-0 from '\x00d\x00\x00\x05' @ 7257571 : 1 .. '\x00e\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/03/25-11:57:09.596 d0e8 Compacting 1@1 + 8@2 files
+2025/03/25-11:57:09.668 d0e8 Generated table #2171@1: 26156 keys, 2278723 bytes
+2025/03/25-11:57:09.712 d0e8 Generated table #2172@1: 13441 keys, 2226462 bytes
+2025/03/25-11:57:09.737 d0e8 Generated table #2173@1: 2992 keys, 2120744 bytes
+2025/03/25-11:57:09.796 d0e8 Generated table #2174@1: 64175 keys, 2203781 bytes
+2025/03/25-11:57:09.876 d0e8 Generated table #2175@1: 104542 keys, 2255320 bytes
+2025/03/25-11:57:09.951 d0e8 Generated table #2176@1: 103324 keys, 2253948 bytes
+2025/03/25-11:57:10.025 d0e8 Generated table #2177@1: 103941 keys, 2254593 bytes
+2025/03/25-11:57:10.080 d0e8 Generated table #2178@1: 75891 keys, 1640751 bytes
+2025/03/25-11:57:10.080 d0e8 Compacted 1@1 + 8@2 files => 17234322 bytes
+2025/03/25-11:57:10.080 d0e8 compacted to: files[ 0 1 20 0 0 0 0 ]
+2025/03/25-11:57:10.587 9c50 Compacting 1@1 + 1@2 files
+2025/03/25-11:57:10.638 9c50 Generated table #2179@1: 43525 keys, 2218308 bytes
+2025/03/25-11:57:10.638 9c50 Compacted 1@1 + 1@2 files => 2218308 bytes
+2025/03/25-11:57:10.638 9c50 compacted to: files[ 0 0 20 0 0 0 0 ]
+2025/03/25-11:57:10.638 9c50 Delete type=2 #2133
+2025/03/25-11:57:10.638 9c50 Delete type=2 #2156
+2025/03/25-11:57:10.639 9c50 Delete type=2 #2157
+2025/03/25-11:57:10.639 9c50 Delete type=2 #2158
+2025/03/25-11:57:10.639 9c50 Delete type=2 #2159
+2025/03/25-11:57:10.639 9c50 Delete type=2 #2160
+2025/03/25-11:57:10.639 9c50 Delete type=2 #2161
+2025/03/25-11:57:10.639 9c50 Delete type=2 #2162
+2025/03/25-11:57:10.639 9c50 Delete type=2 #2170
+2025/03/25-12:02:13.274 cf14 Manual compaction at level-0 from '\x00e\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00f\x00\x00\x00' @ 0 : 0; will stop at (end)
+>>>>>>> feature

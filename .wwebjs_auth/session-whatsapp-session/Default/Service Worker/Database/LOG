@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 2025/03/19-17:52:14.947 3008 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session\Default\Service Worker\Database/MANIFEST-000001
 2025/03/19-17:52:14.960 3008 Recovering log #3
 2025/03/19-17:52:14.961 3008 Reusing old log C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session\Default\Service Worker\Database/000003.log 
+=======
+2025/03/22-10:28:51.061 7ae0 Reusing MANIFEST C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session\Default\Service Worker\Database/MANIFEST-000001
+2025/03/22-10:28:51.076 7ae0 Recovering log #3
+2025/03/22-10:28:51.077 7ae0 Reusing old log C:\Users\aseem\OneDrive\Desktop\whatsapp-task-tracker\.wwebjs_auth\session-whatsapp-session\Default\Service Worker\Database/000003.log 
+>>>>>>> feature
