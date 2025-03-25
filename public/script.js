@@ -1,4 +1,4 @@
-const socket = io('http://localhost:3000');
+const socket = io('https://whatsapp-bot-txcr.onrender.com/');
 console.log('Socket.IO initialized');
 
 const loginButton = document.getElementById('google-login');
